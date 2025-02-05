@@ -7,24 +7,26 @@ def get_recipe():
     shade = request.args.get('shade')  # Get shade from query params
     
     # Check if fabric type and shade exist in the recipes dictionary
-    if fabric_type == "Cotton" and shade== "Dark":
+    if (fabric_type == "Cotton" or fabric_type == "cotton") and (shade== "Dark" or shade == "dark"):
         recipe = recipes_1_cotton_dark
         return jsonify(recipe)
-    if fabric_type == "Cotton" and shade== "Medium":
+    if (fabric_type == "Cotton" or fabric_type == "cotton") and (shade== "Medium" or shade == "medium"):
         recipe = recipes_2_cotton_medium
         return jsonify(recipe)
-    if fabric_type == "Cotton" and shade== "Light":
+    if (fabric_type == "Cotton" or fabric_type == "cotton") and (shade== "Light" or shade == "light"):
         recipe = recipes_3_cotton_light
         return jsonify(recipe)
       # Return the recipe as a JSON response
-    if fabric_type == "Polyster" and  shade=="Dark":
+    if (fabric_type == "Polyster" or fabric_type == "polyster") and  (shade=="Dark" or shade == "dark"):
         recipe = recipes_4_polyester_dark
         return jsonify(recipe)
-    if fabric_type == "Polycotton" and shade == "Dark":
+    if (fabric_type == "Polycotton" or fabric_type == "polycotton") and (shade == "Dark" or shade == "dark"):
         recipe = recipes_5_pc_dark
         return jsonify(recipe)
     else:
         return jsonify({"error": "Recipe not found"}), 404  # Return an error if not found
+
+
 
 
 if __name__ == '__main__':
