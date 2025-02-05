@@ -1,33 +1,44 @@
-from flask import Flask, request, jsonify, render_template_string
-from recipes import recipes_1_cotton_dark, recipes_2_cotton_medium, recipes_3_cotton_light, recipes_4_polyester_dark, recipes_5_pc_dark, recipes_5_sample_shade
+from flask import Flask, request, jsonify
+import json
+from recipes import (
+    recipes_1_cotton_dark,
+    recipes_2_cotton_medium,
+    recipes_3_cotton_light,
+    recipes_4_polyester_dark,
+    recipes_5_pc_dark,
+)
+
 app = Flask(__name__)
+
+# Mapping of fabric types and shades to their corresponding recipe variables
+recipes_dict = {
+    ("cotton", "dark"): recipes_1_cotton_dark,
+    ("cotton", "medium"): recipes_2_cotton_medium,
+    ("cotton", "light"): recipes_3_cotton_light,
+    ("polyester", "dark"): recipes_4_polyester_dark,
+    ("polycotton", "dark"): recipes_5_pc_dark,
+}
+
 @app.route('/get_recipe', methods=['GET'])
 def get_recipe():
-    fabric_type = request.args.get('fabric_type')  # Get fabric type from query params
-    shade = request.args.get('shade')  # Get shade from query params
-    
-    # Check if fabric type and shade exist in the recipes dictionary
-    if (fabric_type == "Cotton" or fabric_type == "cotton") and (shade== "Dark" or shade == "dark"):
-        recipe = recipes_1_cotton_dark
-        return jsonify(recipe)
-    if (fabric_type == "Cotton" or fabric_type == "cotton") and (shade== "Medium" or shade == "medium"):
-        recipe = recipes_2_cotton_medium
-        return jsonify(recipe)
-    if (fabric_type == "Cotton" or fabric_type == "cotton") and (shade== "Light" or shade == "light"):
-        recipe = recipes_3_cotton_light
-        return jsonify(recipe)
-      # Return the recipe as a JSON response
-    if (fabric_type == "Polyster" or fabric_type == "polyster") and  (shade=="Dark" or shade == "dark"):
-        recipe = recipes_4_polyester_dark
-        return jsonify(recipe)
-    if (fabric_type == "Polycotton" or fabric_type == "polycotton") and (shade == "Dark" or shade == "dark"):
-        recipe = recipes_5_pc_dark
-        return jsonify(recipe)
+    # Get parameters, strip whitespaces, and make lowercase to avoid case issues
+    fabric_type = request.args.get('fabric_type', '').strip().lower()
+    shade = request.args.get('shade', '').strip().lower()
+
+    # Validate that both parameters are provided
+    if not fabric_type or not shade:
+        return jsonify({"error": "Both 'fabric_type' and 'shade' parameters are required."}), 400
+
+    # Check if the requested fabric type and shade exist in our dictionary
+    recipe = recipes_dict.get((fabric_type, shade))
+    if recipe:
+        return app.response_class(
+            response=json.dumps(recipe, indent=4),  # Pretty JSON format
+            mimetype='application/json'
+        )
     else:
-        return jsonify({"error": "Recipe not found"}), 404  # Return an error if not found
-
-
-
+        return jsonify({"error": f"Recipe not found for fabric '{fabric_type}' and shade '{shade}'"}), 404
 
 if __name__ == '__main__':
     app.run()
+
