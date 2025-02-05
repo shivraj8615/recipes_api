@@ -1,1 +1,4 @@
-
+Flask
+flask-restplus
+flask-cors
+flask-caching
